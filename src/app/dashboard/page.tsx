@@ -276,18 +276,7 @@ export default function DashboardPage() {
           </button>
         </nav>
 
-        {/* Sidebar Footer User Info */}
-        <div className="p-4 border-t border-slate-50">
-          <div className="bg-[#f8fafc] border border-slate-100 rounded-2xl p-4 flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0">
-              {getInitials(userName)}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-slate-800 truncate">{userName}</p>
-              <p className="text-[10px] text-slate-400 truncate">{userEmail}</p>
-            </div>
-          </div>
-        </div>
+
       </aside>
 
       {/* Main Area */}
