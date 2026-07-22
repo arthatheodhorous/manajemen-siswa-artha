@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState("admin@sekolah.com");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null);
   const [hoveredBirthBarIndex, setHoveredBirthBarIndex] = useState<number | null>(null);
   const [hoveredPieIndex, setHoveredPieIndex] = useState<number | null>(null);
@@ -277,36 +278,14 @@ export default function DashboardPage() {
 
         {/* Sidebar Footer User Info */}
         <div className="p-4 border-t border-slate-50">
-          <div className="bg-[#f8fafc] border border-slate-100 rounded-2xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="h-9 w-9 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs">
-                {getInitials(userName)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-slate-800 truncate">{userName}</p>
-                <p className="text-[10px] text-slate-400 truncate">{userEmail}</p>
-              </div>
+          <div className="bg-[#f8fafc] border border-slate-100 rounded-2xl p-4 flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0">
+              {getInitials(userName)}
             </div>
-            <button
-              onClick={handleLogout}
-              className="text-slate-400 hover:text-red-500 transition p-1 hover:bg-slate-100 rounded-lg cursor-pointer"
-              title="Keluar"
-            >
-              <svg
-                className="h-4.5 w-4.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-            </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-slate-800 truncate">{userName}</p>
+              <p className="text-[10px] text-slate-400 truncate">{userEmail}</p>
+            </div>
           </div>
         </div>
       </aside>
@@ -341,14 +320,66 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* User Profile Badge */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200/80">
-              <div className="h-7 w-7 rounded-full bg-[#1a56db] text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                {getInitials(userName)}
-              </div>
-              <span className="text-xs font-semibold text-slate-700 hidden sm:inline">{userName}</span>
-            </div>
+            {/* User Profile Badge with Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 hover:bg-slate-100 transition cursor-pointer select-none"
+              >
+                <div className="h-7 w-7 rounded-full bg-[#1a56db] text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                  {getInitials(userName)}
+                </div>
+                <span className="text-xs font-semibold text-slate-700 hidden sm:inline">{userName}</span>
+                <svg
+                  className={`h-3 w-3 text-slate-500 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
 
+              {isUserMenuOpen && (
+                <>
+                  {/* Click outside overlay to close */}
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsUserMenuOpen(false)}
+                  />
+                  {/* Dropdown Menu */}
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl z-50 p-4 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="mb-3">
+                      <p className="text-xs font-bold text-slate-800">{userName}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5 truncate">{userEmail}</p>
+                    </div>
+                    <hr className="border-slate-100 my-2" />
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50/70 active:bg-red-100/50 transition cursor-pointer"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
+                      </svg>
+                      Logout
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </header>
 
