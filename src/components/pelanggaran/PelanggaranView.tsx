@@ -48,25 +48,40 @@ const INITIAL_DATA: Pelanggaran[] = [
 
 interface PelanggaranViewProps {
   siswaList?: Siswa[];
+  pelanggaranList?: Pelanggaran[];
+  onPelanggaranListChange?: (newList: Pelanggaran[]) => void;
 }
 
-export default function PelanggaranView({ siswaList }: PelanggaranViewProps) {
-  const [pelanggaranList, setPelanggaranList] = useState<Pelanggaran[]>([]);
+export default function PelanggaranView({
+  siswaList,
+  pelanggaranList: propsPelanggaranList,
+  onPelanggaranListChange,
+}: PelanggaranViewProps) {
+  const [localPelanggaranList, setLocalPelanggaranList] = useState<Pelanggaran[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Load from Supabase on mount
+  const activePelanggaranList = propsPelanggaranList ?? localPelanggaranList;
+
+  // Load from Supabase on mount if unmanaged
   useEffect(() => {
-    async function loadData() {
-      const fetched = await getPelanggaran();
-      setPelanggaranList(fetched);
+    if (!propsPelanggaranList) {
+      async function loadData() {
+        const fetched = await getPelanggaran();
+        setLocalPelanggaranList(fetched);
+      }
+      loadData();
     }
-    loadData();
-  }, []);
+  }, [propsPelanggaranList]);
 
   const updatePelanggaranList = (updater: (prev: Pelanggaran[]) => Pelanggaran[]) => {
-    setPelanggaranList((prev) => updater(prev));
+    const next = updater(activePelanggaranList);
+    if (onPelanggaranListChange) {
+      onPelanggaranListChange(next);
+    } else {
+      setLocalPelanggaranList(next);
+    }
   };
 
   const [isTambahOpen, setIsTambahOpen] = useState(false);
@@ -84,9 +99,9 @@ export default function PelanggaranView({ siswaList }: PelanggaranViewProps) {
 
   // Collect unique jenis pelanggaran from data
   const jenisOptions = useMemo(() => {
-    const set = new Set(pelanggaranList.map((p) => p.jenisPelanggaran));
+    const set = new Set(activePelanggaranList.map((p) => p.jenisPelanggaran));
     return Array.from(set).sort();
-  }, [pelanggaranList]);
+  }, [activePelanggaranList]);
 
   const handleResetFilters = () => {
     setFilterTanggalMulai("");
@@ -99,7 +114,7 @@ export default function PelanggaranView({ siswaList }: PelanggaranViewProps) {
   };
 
   const filteredData = useMemo(() => {
-    return pelanggaranList.filter((item) => {
+    return activePelanggaranList.filter((item) => {
       // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -123,7 +138,7 @@ export default function PelanggaranView({ siswaList }: PelanggaranViewProps) {
       if (filterJenis && item.jenisPelanggaran !== filterJenis) return false;
       return true;
     });
-  }, [pelanggaranList, searchQuery, filterTanggalMulai, filterTanggalSelesai, filterStatus, filterTingkat, filterJenis]);
+  }, [activePelanggaranList, searchQuery, filterTanggalMulai, filterTanggalSelesai, filterStatus, filterTingkat, filterJenis]);
 
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -381,7 +396,7 @@ export default function PelanggaranView({ siswaList }: PelanggaranViewProps) {
           onFilterTingkatChange={(v) => { setFilterTingkat(v); setCurrentPage(1); }}
           onFilterJenisChange={(v) => { setFilterJenis(v); setCurrentPage(1); }}
           onResetFilters={handleResetFilters}
-          totalData={pelanggaranList.length}
+          totalData={activePelanggaranList.length}
           filteredCount={filteredData.length}
           jenisOptions={jenisOptions}
         />

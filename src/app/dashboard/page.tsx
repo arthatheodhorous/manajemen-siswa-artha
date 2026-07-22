@@ -127,39 +127,63 @@ export default function DashboardPage() {
   const lakiPercentage = ((totalLaki / totalSiswaCount) * 100).toFixed(1);
   const perempuanPercentage = ((totalPerempuan / totalSiswaCount) * 100).toFixed(1);
 
-  // Data for "Jenis Pelanggaran"
-  const typesOfViolations = [
-    { name: "Terlambat Masuk Kelas", value: 3, color: "bg-[#ef4444]" },
-    { name: "Tidak Mengerjakan Tugas", value: 2, color: "bg-[#f97316]" },
-    { name: "Membolos", value: 2, color: "bg-[#f59e0b]" },
-    { name: "Seragam Tidak Lengkap", value: 2, color: "bg-[#eab308]" },
-    { name: "Menggunakan HP saat Pelajaran", value: 1, color: "bg-[#10b981]" },
-  ];
+  // Dynamic: Jenis Pelanggaran distribution from real data
+  const JENIS_COLORS = ["bg-[#ef4444]", "bg-[#f97316]", "bg-[#f59e0b]", "bg-[#eab308]", "bg-[#10b981]", "bg-[#3b82f6]", "bg-[#8b5cf6]", "bg-[#ec4899]"];
+  const typesOfViolations = useMemo(() => {
+    const countMap = new Map<string, number>();
+    pelanggaranList.forEach((p) => {
+      countMap.set(p.jenisPelanggaran, (countMap.get(p.jenisPelanggaran) || 0) + 1);
+    });
+    return Array.from(countMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([name, value], i) => ({ name, value, color: JENIS_COLORS[i % JENIS_COLORS.length] }));
+  }, [pelanggaranList]);
 
-  // Data for "Tingkat Pelanggaran"
-  const violationLevels = [
-    { name: "Ringan", value: 7, color: "bg-[#10b981]" },
-    { name: "Sedang", value: 3, color: "bg-[#3b82f6]" },
-    { name: "Berat", value: 2, color: "bg-[#ef4444]" },
-  ];
+  // Dynamic: Tingkat Pelanggaran from real data
+  const violationLevels = useMemo(() => {
+    const ringan = pelanggaranList.filter((p) => p.tingkat === "Ringan").length;
+    const sedang = pelanggaranList.filter((p) => p.tingkat === "Sedang").length;
+    const berat = pelanggaranList.filter((p) => p.tingkat === "Berat").length;
+    return [
+      { name: "Ringan", value: ringan, color: "bg-[#10b981]" },
+      { name: "Sedang", value: sedang, color: "bg-[#3b82f6]" },
+      { name: "Berat", value: berat, color: "bg-[#ef4444]" },
+    ];
+  }, [pelanggaranList]);
 
-  // Data for "Pelanggaran Terbanyak"
-  const topViolationsByClass = [
-    { className: "X RPL 1", count: 3 },
-    { className: "XI RPL 1", count: 3 },
-    { className: "X RPL 2", count: 2 },
-    { className: "XII RPL 1", count: 2 },
-    { className: "XI RPL 2", count: 1 },
-    { className: "XII RPL 2", count: 1 },
-  ];
+  // Dynamic: Pelanggaran Terbanyak per Kelas
+  const topViolationsByClass = useMemo(() => {
+    const countMap = new Map<string, number>();
+    pelanggaranList.forEach((p) => {
+      countMap.set(p.kelas, (countMap.get(p.kelas) || 0) + 1);
+    });
+    return Array.from(countMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([className, count]) => ({ className, count }));
+  }, [pelanggaranList]);
 
-  // Data for "Distribusi Tahun Kelahiran Siswa"
-  const birthYearDistribution = [
-    { year: "2007", count: 6, percentage: "33.3%", color: "bg-[#3b82f6]" },
-    { year: "2006", count: 5, percentage: "27.8%", color: "bg-[#8b5cf6]" },
-    { year: "2008", count: 5, percentage: "27.8%", color: "bg-[#f59e0b]" },
-    { year: "2009", count: 2, percentage: "11.1%", color: "bg-[#10b981]" },
-  ];
+  // Dynamic: Distribusi Tahun Kelahiran Siswa
+  const BIRTH_COLORS = ["bg-[#3b82f6]", "bg-[#8b5cf6]", "bg-[#f59e0b]", "bg-[#10b981]", "bg-[#ef4444]", "bg-[#ec4899]"];
+  const birthYearDistribution = useMemo(() => {
+    const countMap = new Map<string, number>();
+    siswaList.forEach((s) => {
+      if (s.tanggalLahir) {
+        const year = s.tanggalLahir.substring(0, 4);
+        countMap.set(year, (countMap.get(year) || 0) + 1);
+      }
+    });
+    const total = siswaList.filter((s) => s.tanggalLahir).length || 1;
+    return Array.from(countMap.entries())
+      .sort((a, b) => Number(a[0]) - Number(b[0]))
+      .map(([year, count], i) => ({
+        year,
+        count,
+        percentage: ((count / total) * 100).toFixed(1) + "%",
+        color: BIRTH_COLORS[i % BIRTH_COLORS.length],
+      }));
+  }, [siswaList]);
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#f8fafc] text-slate-800 font-sans">
@@ -404,7 +428,11 @@ export default function DashboardPage() {
           )}
 
           {activeTab === "pelanggaran" && (
-            <PelanggaranView siswaList={siswaList} />
+            <PelanggaranView
+              siswaList={siswaList}
+              pelanggaranList={pelanggaranList}
+              onPelanggaranListChange={setPelanggaranList}
+            />
           )}
 
           {activeTab === "dashboard" && (
