@@ -336,7 +336,7 @@ export default function DashboardPage() {
               </svg>
             </button>
             <h1 className="text-sm font-semibold text-slate-800">
-              SMK Negeri 100 Malang
+              SMK Negeri 2 Malang | Artha Maulia Theodhorous
             </h1>
           </div>
 
