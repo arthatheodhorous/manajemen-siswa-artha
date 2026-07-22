@@ -16,6 +16,20 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState("Admin Sekolah");
   const [userEmail, setUserEmail] = useState("admin@sekolah.com");
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Restore active tab from localStorage on client-side mount
+  useEffect(() => {
+    const savedTab = localStorage.getItem("activeTab");
+    if (savedTab) {
+      setActiveTab(savedTab);
+    }
+  }, []);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    localStorage.setItem("activeTab", tab);
+  };
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null);
@@ -176,7 +190,7 @@ export default function DashboardPage() {
         {/* Sidebar Menu */}
         <nav className="flex-1 space-y-1 px-4 py-6">
           <button
-            onClick={() => setActiveTab("dashboard")}
+            onClick={() => handleTabChange("dashboard")}
             className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition duration-150 cursor-pointer ${
               activeTab === "dashboard"
                 ? "bg-[#1a56db] text-white"
@@ -201,7 +215,7 @@ export default function DashboardPage() {
           </button>
 
           <button
-            onClick={() => setActiveTab("siswa")}
+            onClick={() => handleTabChange("siswa")}
             className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition duration-150 cursor-pointer ${
               activeTab === "siswa"
                 ? "bg-[#1a56db] text-white"
@@ -226,7 +240,7 @@ export default function DashboardPage() {
           </button>
 
           <button
-            onClick={() => setActiveTab("kelas")}
+            onClick={() => handleTabChange("kelas")}
             className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition duration-150 cursor-pointer ${
               activeTab === "kelas"
                 ? "bg-[#1a56db] text-white"
@@ -251,7 +265,7 @@ export default function DashboardPage() {
           </button>
 
           <button
-            onClick={() => setActiveTab("pelanggaran")}
+            onClick={() => handleTabChange("pelanggaran")}
             className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition duration-150 cursor-pointer ${
               activeTab === "pelanggaran"
                 ? "bg-[#1a56db] text-white"
