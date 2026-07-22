@@ -63,7 +63,6 @@ interface PelanggaranFormProps {
 export default function PelanggaranForm({ formData, onChange, errorMsg, siswaList, showStatus }: PelanggaranFormProps) {
   const [siswaSearch, setSiswaSearch] = useState(formData.namaSiswa || "");
   const [showSiswaDropdown, setShowSiswaDropdown] = useState(false);
-  const [showJenisSuggestions, setShowJenisSuggestions] = useState(false);
   const [photoTab, setPhotoTab] = useState<"url" | "upload">("url");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -80,23 +79,14 @@ export default function PelanggaranForm({ formData, onChange, errorMsg, siswaLis
       s.nis.includes(siswaSearch)
   );
 
-  const filteredJenis = JENIS_SUGGESTIONS.filter((j) =>
-    j.toLowerCase().includes((formData.jenisPelanggaran || "").toLowerCase())
-  );
-
   const handleSelectSiswa = (siswa: Siswa) => {
     setSiswaSearch(siswa.nama);
     onChange({ namaSiswa: siswa.nama, nis: siswa.nis, kelas: siswa.kelas });
     setShowSiswaDropdown(false);
   };
 
-  const handleSelectJenis = (jenis: string) => {
-    onChange({ jenisPelanggaran: jenis });
-    setShowJenisSuggestions(false);
-  };
-
   const handleTingkatChange = (tingkat: TingkatPelanggaran) => {
-    onChange({ tingkat, poin: POIN_BY_TINGKAT[tingkat] });
+    onChange({ tingkat });
   };
 
   // Sync tab with initial foto format
@@ -225,38 +215,17 @@ export default function PelanggaranForm({ formData, onChange, errorMsg, siswaLis
       {/* Jenis Pelanggaran & Tingkat */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Jenis Pelanggaran */}
-        <div className="relative">
+        <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1.5">
             Jenis Pelanggaran <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             value={formData.jenisPelanggaran}
-            onChange={(e) => {
-              onChange({ jenisPelanggaran: e.target.value });
-              setShowJenisSuggestions(true);
-            }}
-            onFocus={() => setShowJenisSuggestions(true)}
-            onBlur={() => setTimeout(() => setShowJenisSuggestions(false), 200)}
+            onChange={(e) => onChange({ jenisPelanggaran: e.target.value })}
             placeholder="Contoh: Terlambat, Tidak mengerjakan..."
             className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 focus:outline-none transition shadow-2xs"
           />
-          {showJenisSuggestions && filteredJenis.length > 0 && (
-            <div className="absolute top-full left-0 right-0 z-30 mt-1 max-h-48 overflow-y-auto bg-white border border-slate-100 rounded-xl shadow-xl divide-y divide-slate-50">
-              {filteredJenis.map((j) => (
-                <div
-                  key={j}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    handleSelectJenis(j);
-                  }}
-                  className="px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50/70 hover:text-blue-600 transition cursor-pointer"
-                >
-                  {j}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Tingkat */}
