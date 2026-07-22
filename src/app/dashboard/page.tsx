@@ -1051,20 +1051,20 @@ export default function DashboardPage() {
                 </div>
 
                 {/* SVG Bar Chart */}
-                <div className="w-full" style={{ height: 300 }}>
-                  <svg width="100%" height="100%" viewBox="0 0 800 280" preserveAspectRatio="none">
+                <div className="w-full" style={{ height: 320 }}>
+                  <svg width="100%" height="100%" viewBox="0 0 800 300" preserveAspectRatio="none">
                     {(() => {
                       const maxCount = Math.max(...birthYearDistribution.map((d: { count: number }) => d.count), 1);
                       const ySteps = 4;
                       const stepVal = Math.ceil(maxCount / ySteps);
                       const topVal = stepVal * ySteps;
-                      const chartH = 190;
-                      const baseY = 250;
+                      const chartH = 220;
+                      const baseY = 270;
                       const chartX = 40;
                       const chartW = 750;
                       const totalBars = birthYearDistribution.length;
                       const slotW = chartW / totalBars;
-                      const barW = slotW * 0.7;
+                      const barW = Math.min(slotW * 0.35, 60);
 
                       return (
                         <>
