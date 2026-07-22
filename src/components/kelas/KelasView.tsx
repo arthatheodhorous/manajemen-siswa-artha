@@ -76,6 +76,14 @@ export default function KelasView({ kelasList: propsKelasList, onKelasListChange
 
   // Handlers
   const handleAddKelas = async (formData: KelasFormData) => {
+    const isDuplicate = activeKelasList.some(
+      (k) => k.nama.toLowerCase().trim() === formData.nama.toLowerCase().trim()
+    );
+    if (isDuplicate) {
+      alert(`Gagal menambahkan kelas: Kelas dengan nama "${formData.nama}" sudah terdaftar.`);
+      return;
+    }
+
     const created = await addKelas(formData);
     if (created) {
       updateKelasList((prev) => [...prev, created]);
@@ -89,6 +97,14 @@ export default function KelasView({ kelasList: propsKelasList, onKelasListChange
   };
 
   const handleSaveEditKelas = async (id: string, formData: KelasFormData) => {
+    const isDuplicate = activeKelasList.some(
+      (k) => k.id !== id && k.nama.toLowerCase().trim() === formData.nama.toLowerCase().trim()
+    );
+    if (isDuplicate) {
+      alert(`Gagal memperbarui kelas: Kelas dengan nama "${formData.nama}" sudah terdaftar.`);
+      return;
+    }
+
     const success = await updateKelas(id, formData);
     if (success) {
       updateKelasList((prev) =>

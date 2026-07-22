@@ -58,7 +58,11 @@ export async function addKelas(formData: KelasFormData): Promise<Kelas | null> {
 
   if (error) {
     console.error("Error adding kelas:", error);
-    alert("Gagal menambahkan kelas: " + error.message);
+    if (error.code === "23505") {
+      alert("Gagal menambahkan kelas: Kelas dengan nama \"" + formData.nama + "\" sudah terdaftar.");
+    } else {
+      alert("Gagal menambahkan kelas: " + error.message);
+    }
     return null;
   }
 
@@ -73,7 +77,11 @@ export async function updateKelas(id: string, formData: KelasFormData): Promise<
 
   if (error) {
     console.error("Error updating kelas:", error);
-    alert("Gagal memperbarui kelas: " + error.message);
+    if (error.code === "23505") {
+      alert("Gagal memperbarui kelas: Kelas dengan nama \"" + formData.nama + "\" sudah terdaftar.");
+    } else {
+      alert("Gagal memperbarui kelas: " + error.message);
+    }
     return false;
   }
 
@@ -81,11 +89,17 @@ export async function updateKelas(id: string, formData: KelasFormData): Promise<
 }
 
 export async function deleteKelas(id: string): Promise<boolean> {
-  const { error } = await supabase.from("kelas").delete().eq("id", id);
+  const { data, error } = await supabase.from("kelas").delete().eq("id", id).select();
 
   if (error) {
     console.error("Error deleting kelas:", error);
     alert("Gagal menghapus kelas: " + error.message);
+    return false;
+  }
+
+  if (!data || data.length === 0) {
+    console.error("No rows deleted. Check database RLS policies or ID.");
+    alert("Gagal menghapus kelas: Data tidak ditemukan atau akses dihapus ditolak (RLS).");
     return false;
   }
 
@@ -212,11 +226,17 @@ export async function updateSiswa(id: string, formData: SiswaFormData): Promise<
 }
 
 export async function deleteSiswa(id: string): Promise<boolean> {
-  const { error } = await supabase.from("siswa").delete().eq("id", id);
+  const { data, error } = await supabase.from("siswa").delete().eq("id", id).select();
 
   if (error) {
     console.error("Error deleting siswa:", error);
     alert("Gagal menghapus siswa: " + error.message);
+    return false;
+  }
+
+  if (!data || data.length === 0) {
+    console.error("No rows deleted. Check database RLS policies or ID.");
+    alert("Gagal menghapus siswa: Data tidak ditemukan atau akses dihapus ditolak (RLS).");
     return false;
   }
 
@@ -371,11 +391,17 @@ export async function updatePelanggaran(id: string, item: Partial<Pelanggaran>):
 }
 
 export async function deletePelanggaran(id: string): Promise<boolean> {
-  const { error } = await supabase.from("pelanggaran").delete().eq("id", id);
+  const { data, error } = await supabase.from("pelanggaran").delete().eq("id", id).select();
 
   if (error) {
     console.error("Error deleting pelanggaran:", error);
     alert("Gagal menghapus pelanggaran: " + error.message);
+    return false;
+  }
+
+  if (!data || data.length === 0) {
+    console.error("No rows deleted. Check database RLS policies or ID.");
+    alert("Gagal menghapus pelanggaran: Data tidak ditemukan atau akses dihapus ditolak (RLS).");
     return false;
   }
 
