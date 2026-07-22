@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [userName, setUserName] = useState("Admin Sekolah");
   const [userEmail, setUserEmail] = useState("admin@sekolah.com");
-  const [activeTab, setActiveTab] = useState("siswa");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null);
   const [hoveredBirthBarIndex, setHoveredBirthBarIndex] = useState<number | null>(null);
