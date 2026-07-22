@@ -1051,20 +1051,20 @@ export default function DashboardPage() {
                 </div>
 
                 {/* SVG Bar Chart */}
-                <div className="w-full" style={{ height: 320 }}>
-                  <svg width="100%" height="100%" viewBox="0 0 800 300" preserveAspectRatio="none">
+                <div className="w-full relative" style={{ height: 360 }}>
+                  <svg width="100%" height="100%" viewBox="0 0 800 320" preserveAspectRatio="none">
                     {(() => {
                       const maxCount = Math.max(...birthYearDistribution.map((d: { count: number }) => d.count), 1);
                       const ySteps = 4;
                       const stepVal = Math.ceil(maxCount / ySteps);
                       const topVal = stepVal * ySteps;
-                      const chartH = 220;
-                      const baseY = 270;
+                      const chartH = 240;
+                      const baseY = 280;
                       const chartX = 40;
                       const chartW = 750;
                       const totalBars = birthYearDistribution.length;
                       const slotW = chartW / totalBars;
-                      const barW = Math.min(slotW * 0.35, 60);
+                      const barW = Math.min(slotW * 0.5, 90);
 
                       return (
                         <>
@@ -1089,17 +1089,13 @@ export default function DashboardPage() {
                             const slotX = chartX + index * slotW;
                             const barX = slotX + (slotW - barW) / 2;
                             const isHoveredBirth = hoveredBirthBarIndex === index;
-                            // Keep tooltip inside SVG bounds
-                            const tooltipW = 140;
-                            const tooltipX = Math.min(slotX + slotW / 2 - tooltipW / 2, chartX + chartW - tooltipW);
-                            const tooltipY = baseY - barH - 75;
 
                             return (
                               <g
                                 key={index}
                                 onMouseEnter={() => setHoveredBirthBarIndex(index)}
                                 onMouseLeave={() => setHoveredBirthBarIndex(null)}
-                                style={{ cursor: 'crosshair' }}
+                                style={{ cursor: 'pointer' }}
                               >
                                 {/* Hover overlay */}
                                 {isHoveredBirth && (
@@ -1144,43 +1140,6 @@ export default function DashboardPage() {
                                 >
                                   {item.year}
                                 </text>
-
-                                {/* Tooltip on hover - always above bar since there is enough space */}
-                                {isHoveredBirth && tooltipY > 5 && (
-                                  <g>
-                                    {/* Tooltip background */}
-                                    <rect
-                                      x={tooltipX}
-                                      y={tooltipY}
-                                      width={tooltipW}
-                                      height={66}
-                                      rx="8"
-                                      fill="white"
-                                      stroke="#e2e8f0"
-                                      strokeWidth="1"
-                                      filter="drop-shadow(0 4px 14px rgba(0,0,0,0.13))"
-                                    />
-                                    {/* Blue left accent */}
-                                    <rect
-                                      x={tooltipX}
-                                      y={tooltipY}
-                                      width="4"
-                                      height="66"
-                                      rx="2"
-                                      fill="#3b82f6"
-                                    />
-                                    {/* Tooltip texts */}
-                                    <text x={tooltipX + 12} y={tooltipY + 18} fontSize="12" fontWeight="700" fill="#1e293b">
-                                      Tahun {item.year}
-                                    </text>
-                                    <text x={tooltipX + 12} y={tooltipY + 36} fontSize="11" fill="#3b82f6" fontWeight="600">
-                                      Jumlah : {item.count} siswa
-                                    </text>
-                                    <text x={tooltipX + 12} y={tooltipY + 54} fontSize="11" fill="#64748b" fontWeight="500">
-                                      Persentase : {item.percentage}
-                                    </text>
-                                  </g>
-                                )}
                               </g>
                             );
                           })}
@@ -1188,6 +1147,55 @@ export default function DashboardPage() {
                       );
                     })()}
                   </svg>
+
+                  {/* HTML Tooltip Overlay (Prevents text stretching / gepeng) */}
+                  {(() => {
+                    if (hoveredBirthBarIndex === null) return null;
+                    const item = birthYearDistribution[hoveredBirthBarIndex];
+                    if (!item) return null;
+
+                    const totalBars = birthYearDistribution.length;
+                    const chartX = 40;
+                    const chartW = 750;
+                    const slotW = chartW / totalBars;
+                    const slotCenterX = chartX + (hoveredBirthBarIndex + 0.5) * slotW;
+                    const leftPct = (slotCenterX / 800) * 100;
+
+                    const maxCount = Math.max(...birthYearDistribution.map((d: { count: number }) => d.count), 1);
+                    const ySteps = 4;
+                    const stepVal = Math.ceil(maxCount / ySteps);
+                    const topVal = stepVal * ySteps;
+                    const chartH = 240;
+                    const baseY = 280;
+                    const barH = (item.count / topVal) * chartH;
+                    const topY = baseY - barH - 18;
+                    const topPct = (topY / 320) * 100;
+
+                    return (
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: `${leftPct}%`,
+                          top: `${topPct}%`,
+                          transform: "translate(-50%, -100%)",
+                          pointerEvents: "none",
+                          zIndex: 30,
+                        }}
+                        className="w-40 bg-white border border-slate-200/80 rounded-xl p-3 shadow-lg flex flex-col gap-1 transition-all duration-100 ease-out"
+                      >
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-l-xl" />
+                        <p className="text-[11px] font-bold text-slate-800 leading-tight">
+                          Tahun {item.year}
+                        </p>
+                        <p className="text-[11px] text-blue-600 font-semibold leading-tight">
+                          Jumlah: {item.count} siswa
+                        </p>
+                        <p className="text-[10px] text-slate-500 font-medium leading-tight">
+                          Persentase: {item.percentage}
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Detail Distribusi - inline legend like reference image */}
