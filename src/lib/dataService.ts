@@ -34,16 +34,7 @@ export async function getKelas(): Promise<Kelas[]> {
     return INITIAL_KELAS_DATA;
   }
 
-  if (!data || data.length === 0) {
-    // Seed initial data to Supabase if database is empty
-    for (const item of INITIAL_KELAS_DATA) {
-      await supabase.from("kelas").insert([{ nama: item.nama }]);
-    }
-    const { data: seeded } = await supabase.from("kelas").select("*").order("created_at", { ascending: true });
-    return (seeded || []).map((row) => ({ id: row.id, nama: row.nama }));
-  }
-
-  return data.map((row) => ({
+  return (data || []).map((row) => ({
     id: row.id,
     nama: row.nama,
   }));
@@ -120,36 +111,7 @@ export async function getSiswa(): Promise<Siswa[]> {
     return INITIAL_SISWA_DATA;
   }
 
-  if (!data || data.length === 0) {
-    // Seed initial data to Supabase if database is empty
-    const seedPayload = INITIAL_SISWA_DATA.map((item) => ({
-      nama: item.nama,
-      nis: item.nis,
-      kelas: item.kelas,
-      jenis_kelamin: item.jenisKelamin,
-      tanggal_lahir: item.tanggalLahir || null,
-      alamat: item.alamat || null,
-    }));
-
-    const { error: seedErr } = await supabase.from("siswa").insert(seedPayload);
-    if (seedErr) {
-      console.error("Error seeding siswa data:", seedErr);
-    }
-    const { data: seeded } = await supabase.from("siswa").select("*").order("created_at", { ascending: false });
-    if (seeded && seeded.length > 0) {
-      return seeded.map((row) => ({
-        id: row.id,
-        nama: row.nama,
-        nis: row.nis,
-        kelas: row.kelas,
-        jenisKelamin: row.jenis_kelamin as "L" | "P",
-        tanggalLahir: row.tanggal_lahir || undefined,
-        alamat: row.alamat || undefined,
-      }));
-    }
-  }
-
-  return data.map((row) => ({
+  return (data || []).map((row) => ({
     id: row.id,
     nama: row.nama,
     nis: row.nis,
@@ -257,46 +219,7 @@ export async function getPelanggaran(): Promise<Pelanggaran[]> {
     return INITIAL_PELANGGARAN_DATA;
   }
 
-  if (!data || data.length === 0) {
-    // Seed initial pelanggaran data if empty
-    const seedPayload = INITIAL_PELANGGARAN_DATA.map((item) => ({
-      nama_siswa: item.namaSiswa,
-      nis: item.nis,
-      kelas: item.kelas,
-      jenis_pelanggaran: item.jenisPelanggaran,
-      tingkat: item.tingkat,
-      poin: item.poin,
-      tanggal: item.tanggal,
-      waktu: item.waktu,
-      lokasi: item.lokasi || null,
-      deskripsi: item.deskripsi || null,
-      foto: item.foto || null,
-      status: item.status,
-    }));
-
-    await supabase.from("pelanggaran").insert(seedPayload);
-    const { data: seeded } = await supabase.from("pelanggaran").select("*").order("created_at", { ascending: false });
-    if (seeded && seeded.length > 0) {
-      return seeded.map((row) => ({
-        id: row.id,
-        siswa_id: row.siswa_id || undefined,
-        namaSiswa: row.nama_siswa,
-        nis: row.nis,
-        kelas: row.kelas,
-        jenisPelanggaran: row.jenis_pelanggaran,
-        tingkat: row.tingkat,
-        poin: row.poin,
-        tanggal: row.tanggal,
-        waktu: row.waktu,
-        lokasi: row.lokasi || undefined,
-        deskripsi: row.deskripsi || undefined,
-        foto: row.foto || undefined,
-        status: row.status,
-      }));
-    }
-  }
-
-  return data.map((row) => ({
+  return (data || []).map((row) => ({
     id: row.id,
     siswa_id: row.siswa_id || undefined,
     namaSiswa: row.nama_siswa,
