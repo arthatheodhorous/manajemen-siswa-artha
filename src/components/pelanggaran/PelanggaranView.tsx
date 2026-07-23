@@ -247,7 +247,7 @@ export default function PelanggaranView({
     const link = document.createElement("a");
     const dateStr = new Date().toISOString().split("T")[0];
     link.setAttribute("href", url);
-    link.setAttribute("download", `Data_Pelanggaran_SMKN100_${dateStr}.csv`);
+    link.setAttribute("download", `Data_Pelanggaran_SMKN2_${dateStr}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -295,7 +295,7 @@ export default function PelanggaranView({
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Laporan Data Pelanggaran Siswa - SMK Negeri 100 Malang</title>
+        <title>Laporan Data Pelanggaran Siswa - SMKN 2 Malang</title>
         <style>
           body { font-family: 'Segoe UI', Roboto, sans-serif; padding: 30px; color: #1e293b; background: #fff; }
           .header { text-align: center; border-bottom: 2px solid #1a56db; padding-bottom: 12px; margin-bottom: 20px; }
@@ -316,7 +316,7 @@ export default function PelanggaranView({
       </head>
       <body>
         <div class="header">
-          <h1>SMK NEGERI 100 MALANG</h1>
+          <h1>SMK NEGERI 2 MALANG</h1>
           <h2>LAPORAN DATA PELANGGARAN SISWA</h2>
         </div>
 
